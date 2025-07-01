@@ -1,3 +1,3 @@
 # Softwere-Engineering
 
-Belajar dari HTML, CSS dan Java scrip
+Belajar dari HTML, CSS dan Java script
