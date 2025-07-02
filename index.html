@@ -1,11 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>CRUD Mahasiswa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Hallo semuany saya ada di sini untuk membimbing kalian agar bisa bisa bisa maju lakukan</h1>
+<body class="bg-gray-100 text-gray-800">
+
+  <header class="bg-gray-300 p-4 text-center">
+    <h1 class="text-2xl font-bold">Universitas Coding Santuy</h1>
+  </header>
+
+  <main class="flex flex-col md:flex-row gap-4 p-6">
+    <!-- Left Form -->
+    <div class="flex-1 space-y-4">
+      <section class="bg-white p-4 rounded shadow">
+        <h2 class="text-xl font-semibold mb-2">Data Mahasiswa</h2>
+        <p class="text-sm">
+          Form ini digunakan untuk menambah, mengedit, dan menghapus data mahasiswa secara real-time.
+        </p>
+      </section>
+
+      <article class="bg-white p-4 rounded shadow">
+        <form id="mahasiswaForm" class="space-y-4">
+          <div>
+            <label class="block font-medium">NAMA</label>
+            <input type="text" id="nama" class="w-full px-3 py-2 border rounded" required />
+          </div>
+          <div>
+            <label class="block font-medium">NIM</label>
+            <input type="text" id="nim" class="w-full px-3 py-2 border rounded" required />
+          </div>
+          <div>
+            <label class="block font-medium">JURUSAN</label>
+            <div class="mt-1 space-x-4">
+              <label><input type="radio" name="jurusan" value="Teknik Informatika" class="mr-1" />Teknik Informatika</label>
+              <label><input type="radio" name="jurusan" value="Sistem Informasi" class="mr-1" />Sistem Informasi</label>
+            </div>
+          </div>
+          <div>
+            <label class="block font-medium">ANGKATAN</label>
+            <input type="text" id="angkatan" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div>
+            <label class="block font-medium">IPK</label>
+            <input type="number" id="ipk" step="0.01" class="w-full px-3 py-2 border rounded" />
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button type="button" id="btnCreate" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create</button>
+            <button type="button" id="btnUpdate" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Update</button>
+            <button type="button" id="btnDelete" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Delete</button>
+            <button type="button" id="btnRead" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Read</button>
+          </div>
+        </form>
+      </article>
+    </div>
+
+    <!-- Right Table -->
+    <aside class="flex-1 bg-white p-4 rounded shadow overflow-auto">
+      <h3 class="text-lg font-semibold mb-2">Data Tabel Mahasiswa</h3>
+      <table class="w-full table-auto border border-gray-300" id="tabelMahasiswa">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="border px-2 py-1">NAMA</th>
+            <th class="border px-2 py-1">NIM</th>
+            <th class="border px-2 py-1">JURUSAN</th>
+            <th class="border px-2 py-1">ANGKATAN</th>
+            <th class="border px-2 py-1">IPK</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </aside>
+  </main>
+
+  <footer class="bg-gray-300 p-4 text-center">
+    <p>&copy; 2025 Universitas Coding Santuy</p>
+  </footer>
+
+  <script>
+    let selectedRow = null;
+    const mahasiswaData = [];
+
+    function resetForm() {
+      document.getElementById("mahasiswaForm").reset();
+      selectedRow = null;
+    }
+
+    function refreshTable() {
+      const tbody = document.querySelector("#tabelMahasiswa tbody");
+      tbody.innerHTML = "";
+
+      mahasiswaData.forEach((mhs, index) => {
+        const row = document.createElement("tr");
+        row.classList.add("cursor-pointer", "hover:bg-gray-100");
+        row.innerHTML = `
+          <td class="border px-2 py-1">${mhs.nama}</td>
+          <td class="border px-2 py-1">${mhs.nim}</td>
+          <td class="border px-2 py-1">${mhs.jurusan}</td>
+          <td class="border px-2 py-1">${mhs.angkatan}</td>
+          <td class="border px-2 py-1">${mhs.ipk}</td>
+        `;
+        row.onclick = () => selectRow(index);
+        tbody.appendChild(row);
+      });
+    }
+
+    function selectRow(index) {
+      const mhs = mahasiswaData[index];
+      document.getElementById("nama").value = mhs.nama;
+      document.getElementById("nim").value = mhs.nim;
+      document.querySelector(`input[name="jurusan"][value="${mhs.jurusan}"]`).checked = true;
+      document.getElementById("angkatan").value = mhs.angkatan;
+      document.getElementById("ipk").value = mhs.ipk;
+      selectedRow = index;
+    }
+
+    document.getElementById("btnCreate").onclick = () => {
+      const nama = document.getElementById("nama").value;
+      const nim = document.getElementById("nim").value;
+      const jurusan = document.querySelector('input[name="jurusan"]:checked')?.value;
+      const angkatan = document.getElementById("angkatan").value;
+      const ipk = document.getElementById("ipk").value;
+
+      if (!nama || !nim || !jurusan) {
+        alert("Lengkapi data yang wajib!");
+        return;
+      }
+
+      mahasiswaData.push({ nama, nim, jurusan, angkatan, ipk });
+      resetForm();
+      refreshTable();
+    };
+
+    document.getElementById("btnUpdate").onclick = () => {
+      if (selectedRow === null) {
+        alert("Pilih baris untuk di-update!");
+        return;
+      }
+
+      mahasiswaData[selectedRow] = {
+        nama: document.getElementById("nama").value,
+        nim: document.getElementById("nim").value,
+        jurusan: document.querySelector('input[name="jurusan"]:checked')?.value,
+        angkatan: document.getElementById("angkatan").value,
+        ipk: document.getElementById("ipk").value
+      };
+
+      resetForm();
+      refreshTable();
+    };
+
+    document.getElementById("btnDelete").onclick = () => {
+      if (selectedRow === null) {
+        alert("Pilih baris untuk dihapus!");
+        return;
+      }
+
+      mahasiswaData.splice(selectedRow, 1);
+      resetForm();
+      refreshTable();
+    };
+
+    document.getElementById("btnRead").onclick = () => {
+      refreshTable();
+    };
+
+    // Initialize empty table
+    refreshTable();
+  </script>
 </body>
-</html>`
+</html>
